@@ -1,334 +1,202 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Nishka 💗</title>
-  <style>
-    :root{
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      --pink:#ff2e83;
-      --soft:#ffe6f2;
-      --soft2:#ffd1e6;
-      --card:#ffffff;
-      --shadow: 0 24px 80px rgba(0,0,0,0.18);
-    }
+<meta charset="utf-8">
+<title>Nishka 💗</title>
 
-    body{
-      margin:0;
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at 20% 10%, rgba(255,46,131,0.18), transparent 45%),
-        radial-gradient(circle at 85% 25%, rgba(255,46,131,0.12), transparent 40%),
-        radial-gradient(circle at 40% 90%, rgba(255,46,131,0.10), transparent 45%),
-        linear-gradient(180deg, var(--soft), #fff);
-    }
+<style>
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+font-family:Arial, sans-serif;
+overflow:hidden;
+background:linear-gradient(180deg,#ffd6e8,#fff);
+}
 
-    /* floating hearts background */
-    .float-hearts{
-      position:fixed; inset:0;
-      pointer-events:none;
-      overflow:hidden;
-      z-index:0;
-    }
-    .fh{
-      position:absolute;
-      font-size:18px;
-      opacity:0.18;
-      animation: drift linear infinite;
-      filter: blur(0.2px);
-    }
-    @keyframes drift{
-      from{ transform: translateY(110vh) translateX(0) rotate(0deg); }
-      to{ transform: translateY(-20vh) translateX(40px) rotate(360deg); }
-    }
+/* floating hearts background */
+.bgHeart{
+position:fixed;
+font-size:20px;
+opacity:0.15;
+animation:float 12s linear infinite;
+}
+@keyframes float{
+from{transform:translateY(110vh)}
+to{transform:translateY(-20vh)}
+}
 
-    .card{
-      width:min(720px, 92vw);
-      background:var(--card);
-      border-radius:28px;
-      padding:34px 28px;
-      box-shadow: var(--shadow);
-      text-align:center;
-      position:relative;
-      z-index:2;
-      animation: popIn 520ms ease both;
-    }
-    @keyframes popIn{
-      from{ transform: translateY(18px) scale(0.98); opacity:0; }
-      to{ transform: translateY(0) scale(1); opacity:1; }
-    }
+.card{
+background:white;
+padding:35px;
+border-radius:25px;
+box-shadow:0 20px 70px rgba(0,0,0,0.2);
+text-align:center;
+width:700px;
+max-width:90%;
+position:relative;
+}
 
-    h1{
-      margin:0 0 10px;
-      font-size:34px;
-      letter-spacing:-0.4px;
-    }
-    p{
-      margin:0 0 20px;
-      opacity:0.85;
-      font-size:16px;
-    }
+button{
+padding:14px 26px;
+border:none;
+border-radius:999px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin:6px;
+}
 
-    .btns{
-      display:flex;
-      justify-content:center;
-      gap:16px;
-      margin-top:14px;
-      position:relative;
-      height:64px;
-      align-items:center;
-    }
+#yesBtn{
+background:#ff2e83;
+color:white;
+animation:pulse 1.3s infinite;
+}
 
-    button{
-      border:0;
-      padding:14px 26px;
-      border-radius:999px;
-      font-size:16px;
-      font-weight:750;
-      cursor:pointer;
-      user-select:none;
-      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-      box-shadow: 0 12px 30px rgba(255,46,131,0.18);
-    }
-    button:active{ transform: scale(0.98); }
+@keyframes pulse{
+0%,100%{transform:scale(1)}
+50%{transform:scale(1.07)}
+}
 
-    #yesBtn{
-      background: var(--pink);
-      color:#fff;
-      animation: pulse 1.25s ease-in-out infinite;
-    }
-    @keyframes pulse{
-      0%,100%{ transform: translateY(0) scale(1); }
-      50%{ transform: translateY(-1px) scale(1.03); }
-    }
+#noBtn{
+background:#eee;
+position:absolute;
+}
 
-    #noBtn{
-      background:#f3f3f3;
-      color:#222;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.10);
-      position:relative; /* we move it with translate */
-    }
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:5;
+}
 
-    .hint{
-      margin-top:14px;
-      min-height:26px;
-      font-weight:700;
-    }
+.overlay.show{display:flex;}
 
-    /* Overlay modal */
-    .overlay{
-      position:fixed; inset:0;
-      display:none;
-      place-items:center;
-      background: rgba(0,0,0,0.45);
-      z-index:50;
-      padding:22px;
-      backdrop-filter: blur(2px);
-    }
-    .overlay.show{ display:grid; }
+.loveBox{
+background:white;
+padding:25px;
+border-radius:25px;
+text-align:center;
+}
 
-    .loveBox{
-      width:min(560px, 94vw);
-      background:#fff;
-      border-radius:28px;
-      padding:22px 22px 18px;
-      box-shadow: 0 22px 90px rgba(0,0,0,0.28);
-      text-align:center;
-      animation: modalIn 420ms ease both;
-      position:relative;
-      overflow:hidden;
-    }
-    @keyframes modalIn{
-      from{ transform: translateY(20px) scale(0.98); opacity:0; }
-      to{ transform: translateY(0) scale(1); opacity:1; }
-    }
+.heartImg{
+width:270px;
+height:270px;
+object-fit:cover;
 
-    .loveBox::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(circle at top, rgba(255,46,131,0.18), transparent 55%);
-      pointer-events:none;
-    }
+/* zoom out + move down */
+transform:scale(0.9);
+object-position:center 80%;
 
-    .heartWrap{
-      width:280px;
-      height:280px;
-      margin: 8px auto 14px;
-      filter: drop-shadow(0 14px 34px rgba(0,0,0,0.18));
-      position:relative;
-      z-index:1;
-    }
+clip-path:path("M140 254 C 22 180, 10 98, 70 60 C 102 34, 128 58, 140 84 C 152 58, 178 34, 210 60 C 270 98, 258 180, 140 254 Z");
+display:block;
+margin:auto;
+}
 
-    .heartImg{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-
-      /* Move the photo DOWN a bit so more face shows */
-      object-position: center 65%;
-
-      clip-path: path("M140 254 C 22 180, 10 98, 70 60 C 102 34, 128 58, 140 84 C 152 58, 178 34, 210 60 C 270 98, 258 180, 140 254 Z");
-      border-radius:18px;
-      display:block;
-      transform: scale(1.08); /* zoom in slightly to fill heart more */
-    }
-
-    .loveTitle{
-      font-size:22px;
-      font-weight:900;
-      margin:6px 0 6px;
-      position:relative;
-      z-index:1;
-    }
-    .loveSub{
-      margin:0;
-      font-weight:650;
-      opacity:0.92;
-      line-height:1.35;
-      position:relative;
-      z-index:1;
-    }
-    .tap{
-      margin-top:10px;
-      font-size:13px;
-      opacity:0.72;
-      position:relative;
-      z-index:1;
-    }
-
-    /* Falling roses */
-    .rose{
-      position:fixed;
-      top:-40px;
-      font-size:28px;
-      z-index:60;
-      pointer-events:none;
-      animation: fall linear forwards;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.15));
-    }
-    @keyframes fall{
-      to{
-        transform: translateY(110vh) rotate(360deg);
-        opacity: 0.98;
-      }
-    }
-  </style>
+.rose{
+position:fixed;
+top:-40px;
+font-size:28px;
+animation:fall linear forwards;
+pointer-events:none;
+}
+@keyframes fall{
+to{transform:translateY(110vh) rotate(360deg)}
+}
+</style>
 </head>
+
 <body>
 
-  <div class="float-hearts" id="floatHearts"></div>
+<!-- floating hearts -->
+<script>
+for(let i=0;i<18;i++){
+let h=document.createElement("div");
+h.className="bgHeart";
+h.textContent="💗";
+h.style.left=Math.random()*100+"vw";
+h.style.animationDuration=(8+Math.random()*8)+"s";
+document.body.appendChild(h);
+}
+</script>
 
-  <div class="card" id="card">
-    <h1>💘 Nishka, will you be my Valentine? 💘</h1>
-    <p>Choose wisely 😭</p>
+<div class="card" id="card">
+<h2>💘 Nishka, will you be my Valentine? 💘</h2>
 
-    <div class="btns" id="btnArea">
-      <button id="yesBtn">Yes 💗</button>
-      <button id="noBtn">No 😢</button>
-    </div>
+<button id="yesBtn">Yes 💗</button>
+<button id="noBtn">No 😢</button>
+</div>
 
-    <div class="hint" id="hint"></div>
-  </div>
+<div class="overlay" id="overlay">
+<div class="loveBox">
 
-  <div class="overlay" id="overlay">
-    <div class="loveBox">
-      <div class="heartWrap">
-        <img class="heartImg" src="IMG_2696.jpg" alt="Us" />
-      </div>
+<img class="heartImg" src="IMG_2696.jpg">
 
-      <div class="loveTitle">YAYYY 😭💗 I LOVE YOU!</div>
-      <p class="loveSub">
-        You’re the best Valentine ever…<br />
-        Your gifts will arrive when I arrive ❤️
-      </p>
-      <div class="tap">(Tap anywhere to close)</div>
-    </div>
-  </div>
+<h3>YAYYY 💗 I LOVE YOU!💗</h3>
+<p>You’re the best Valentine ever…<br>
+Your gifts will arrive when I arrive ❤️</p>
 
-  <script>
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const hint = document.getElementById("hint");
-    const overlay = document.getElementById("overlay");
-    const btnArea = document.getElementById("btnArea");
-    const floatHearts = document.getElementById("floatHearts");
+<p style="opacity:.7">(tap anywhere to close)</p>
 
-    // Background floating hearts
-    const heartEmojis = ["💗","💖","💘","💕","💞"];
-    for (let i = 0; i < 18; i++) {
-      const h = document.createElement("div");
-      h.className = "fh";
-      h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
-      h.style.left = Math.random()*100 + "vw";
-      h.style.top  = (Math.random()*100) + "vh";
-      h.style.animationDuration = (10 + Math.random()*10) + "s";
-      h.style.fontSize = (14 + Math.random()*16) + "px";
-      floatHearts.appendChild(h);
-    }
+</div>
+</div>
 
-    // Make NO run away (but still visible next to YES)
-    function moveNo() {
-      const maxX = 180;
-      const maxY = 50;
-      const x = (Math.random() * maxX) - (maxX / 2);
-      const y = (Math.random() * maxY) - (maxY / 2);
-      noBtn.style.transform = `translate(${x}px, ${y}px)`;
-    }
+<script>
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const overlay=document.getElementById("overlay");
+const card=document.getElementById("card");
 
-    // Detect cursor near the NO button (works even if we block click)
-    btnArea.addEventListener("mousemove", (e) => {
-      const r = noBtn.getBoundingClientRect();
-      const near =
-        e.clientX > r.left - 70 && e.clientX < r.right + 70 &&
-        e.clientY > r.top - 70 && e.clientY < r.bottom + 70;
-      if (near) moveNo();
-    });
+/* NO button dodge */
+function moveNo(){
+let cardRect=card.getBoundingClientRect();
+let btnRect=noBtn.getBoundingClientRect();
 
-    // Block NO clicks (in case it ever gets clicked)
-    noBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      hint.textContent = "No is not an option 😌";
-      moveNo();
-      setTimeout(() => hint.textContent = "", 1200);
-    });
+let x=Math.random()*(cardRect.width-btnRect.width-20);
+let y=Math.random()*(cardRect.height-btnRect.height-20);
 
-    // Roses effect
-    let roseTimer = null;
-    function startRoses() {
-      if (roseTimer) return;
-      roseTimer = setInterval(() => {
-        const rose = document.createElement("div");
-        rose.className = "rose";
-        rose.textContent = "🌹";
-        rose.style.left = Math.random() * 100 + "vw";
-        rose.style.animationDuration = (2.8 + Math.random() * 2.6) + "s";
-        rose.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);
-        document.body.appendChild(rose);
-        setTimeout(() => rose.remove(), 6500);
-      }, 120);
-    }
+noBtn.style.left=x+"px";
+noBtn.style.top=y+"px";
+}
 
-    yesBtn.addEventListener("click", () => {
-      overlay.classList.add("show");
-      startRoses();
-      hint.textContent = "YAYYY 😭💗";
-      // stop pulsing after click
-      yesBtn.style.animation = "none";
-      yesBtn.disabled = true;
-      yesBtn.style.opacity = "0.95";
-    });
+noBtn.addEventListener("mouseenter",moveNo);
+noBtn.addEventListener("mousemove",moveNo);
 
-    overlay.addEventListener("click", () => {
-      overlay.classList.remove("show");
-    });
+noBtn.addEventListener("click",(e)=>{
+e.preventDefault();
+moveNo();
+});
 
-    // Start NO in a nice position
-    moveNo();
-  </script>
+/* YES click */
+yesBtn.onclick=()=>{
+overlay.classList.add("show");
+startRoses();
+};
+
+/* close overlay */
+overlay.onclick=()=>overlay.classList.remove("show");
+
+/* roses */
+function startRoses(){
+setInterval(()=>{
+let r=document.createElement("div");
+r.className="rose";
+r.textContent="🌹";
+r.style.left=Math.random()*100+"vw";
+r.style.animationDuration=(2+Math.random()*2)+"s";
+document.body.appendChild(r);
+setTimeout(()=>r.remove(),4000);
+},120);
+}
+
+/* start position */
+moveNo();
+</script>
+
 </body>
 </html>
