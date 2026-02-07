@@ -27,7 +27,7 @@
         linear-gradient(180deg, var(--bg1), var(--bg2), #fff);
     }
 
-    /* Floating hearts in the background */
+    /* Floating hearts background */
     .float-hearts{
       position:fixed; inset:0;
       pointer-events:none;
@@ -49,7 +49,7 @@
       width:min(760px, 92vw);
       background:var(--card);
       border-radius:30px;
-      padding:36px 30px;
+      padding:40px 32px;
       box-shadow: 0 22px 85px rgba(0,0,0,0.18);
       text-align:center;
       position:relative;
@@ -72,7 +72,6 @@
       font-size:16px;
     }
 
-    /* Button row */
     .btnRow{
       display:flex;
       justify-content:center;
@@ -110,7 +109,7 @@
       background:#f2f2f2;
       color:#222;
       box-shadow: 0 12px 26px rgba(0,0,0,0.12);
-      position:relative; /* we move it using translate (stays in row) */
+      position:relative;
     }
 
     .hint{
@@ -133,10 +132,10 @@
     .overlay.show{ display:grid; }
 
     .loveBox{
-      width:min(600px, 94vw);
+      width:min(640px, 94vw);
       background:#fff;
       border-radius:30px;
-      padding:22px 22px 18px;
+      padding:24px 22px 18px;
       box-shadow: 0 24px 95px rgba(0,0,0,0.28);
       text-align:center;
       animation: modalIn 420ms ease both;
@@ -155,28 +154,21 @@
       pointer-events:none;
     }
 
-    /* Heart image container */
+    /* Use your heart-framed image as-is */
     .heartWrap{
-      width:300px;
-      height:300px;
-      margin: 8px auto 14px;
+      width:320px;
+      height:320px;
+      margin: 6px auto 14px;
       filter: drop-shadow(0 16px 38px rgba(0,0,0,0.18));
       position:relative;
       z-index:1;
     }
-
-    .heartImg{
+    .heartPic{
       width:100%;
       height:100%;
-      object-fit:cover;
-
-      /* FIX: zoom out + push image DOWN so faces show */
-      transform: scale(0.82);
-      object-position: center 92%;
-
-      clip-path: path("M150 272 C 24 192, 12 105, 75 64 C 110 36, 138 62, 150 90 C 162 62, 190 36, 225 64 C 288 105, 276 192, 150 272 Z");
-      border-radius:18px;
+      object-fit:contain;   /* keep the whole heart visible */
       display:block;
+      border-radius:18px;
       background:#fff;
     }
 
@@ -240,7 +232,8 @@
   <div class="overlay" id="overlay">
     <div class="loveBox">
       <div class="heartWrap">
-        <img class="heartImg" src="IMG_2696.jpg" alt="Us" />
+        <!-- IMPORTANT: make sure your uploaded file is named heart.png -->
+        <img class="heartPic" src="heart.png" alt="Us" />
       </div>
 
       <div class="loveTitle">YAYYY 😭💗 I LOVE YOU!</div>
@@ -260,7 +253,7 @@
     const btnRow = document.getElementById("btnRow");
     const floatHearts = document.getElementById("floatHearts");
 
-    // Background floating hearts
+    // Floating hearts background
     const heartEmojis = ["💗","💖","💘","💕","💞"];
     for (let i = 0; i < 18; i++) {
       const h = document.createElement("div");
@@ -273,19 +266,18 @@
       floatHearts.appendChild(h);
     }
 
-    // NO starts next to YES (no movement initially)
+    // No starts next to Yes (no movement initially)
     noBtn.style.transform = "translate(0,0)";
 
-    // Make NO dodge only when cursor gets near it
+    // No dodges only when cursor gets near
     function dodgeNo() {
-      const maxX = 220; // sideways dodge
-      const maxY = 60;  // small vertical dodge
+      const maxX = 220;
+      const maxY = 60;
       const x = (Math.random() * maxX) - (maxX / 2);
       const y = (Math.random() * maxY) - (maxY / 2);
       noBtn.style.transform = `translate(${x}px, ${y}px)`;
     }
 
-    // Detect cursor near the NO button (works even if we block click)
     btnRow.addEventListener("mousemove", (e) => {
       const r = noBtn.getBoundingClientRect();
       const near =
@@ -294,7 +286,7 @@
       if (near) dodgeNo();
     });
 
-    // Make sure NO cannot be clicked
+    // No cannot be clicked (and shows message)
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -303,7 +295,7 @@
       setTimeout(() => hint.textContent = "", 1200);
     });
 
-    // Roses effect
+    // Roses after YES
     let roseTimer = null;
     function startRoses() {
       if (roseTimer) return;
@@ -322,8 +314,6 @@
     yesBtn.addEventListener("click", () => {
       overlay.classList.add("show");
       startRoses();
-
-      // stop pulsing after click
       yesBtn.style.animation = "none";
       yesBtn.disabled = true;
       yesBtn.style.opacity = "0.95";
