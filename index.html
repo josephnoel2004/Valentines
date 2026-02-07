@@ -200,50 +200,58 @@ for (let i = 0; i < 18; i++) {
   floatHearts.appendChild(h);
 }
 
-/* --- ONLY CHANGED PART: NO movement slower + clamped on-screen --- */
+/* ===== ONLY THE NO MOVEMENT IS FIXED BELOW ===== */
 let detached = false;
 let dodges = 0;
 
 function detachNoIfNeeded(){
   if(detached) return;
   detached = true;
+
   const r = noBtn.getBoundingClientRect();
   noBtn.style.position = "fixed";
-  noBtn.style.left = r.left + "px";
-  noBtn.style.top  = r.top  + "px";
+  noBtn.style.left = `${Math.round(r.left)}px`;
+  noBtn.style.top  = `${Math.round(r.top)}px`;
   noBtn.style.transform = "none";
 }
 
+// hard clamp that NEVER allows out-of-screen
 function clamp(val, min, max){
-  return Math.max(min, Math.min(max, val));
+  if (max < min) return min;         // safety for tiny screens
+  return Math.min(max, Math.max(min, val));
 }
 
 function dodgeNo(){
   detachNoIfNeeded();
   dodges++;
 
-  const pad = 12;
-  const btnRect = noBtn.getBoundingClientRect();
+  const pad = 14;
 
-  const maxLeft = window.innerWidth  - btnRect.width  - pad;
-  const maxTop  = window.innerHeight - btnRect.height - pad;
+  // Use real button size (more reliable than getBoundingClientRect mid-transition)
+  const bw = noBtn.offsetWidth;
+  const bh = noBtn.offsetHeight;
 
-  // pick a random position then CLAMP it so it never goes off-screen
-  let left = pad + Math.random() * maxLeft;
-  let top  = pad + Math.random() * maxTop;
+  const minLeft = pad;
+  const minTop  = pad;
+  const maxLeft = window.innerWidth  - bw - pad;
+  const maxTop  = window.innerHeight - bh - pad;
 
-  left = clamp(left, pad, maxLeft);
-  top  = clamp(top, pad, maxTop);
+  // Pick random and clamp
+  let left = minLeft + Math.random() * Math.max(0, maxLeft - minLeft);
+  let top  = minTop  + Math.random() * Math.max(0, maxTop  - minTop);
 
-  // SLOWER movement (bigger ms = slower)
-  const speed = Math.max(220, 340 - dodges * 6);
+  left = clamp(Math.round(left), minLeft, maxLeft);
+  top  = clamp(Math.round(top),  minTop,  maxTop);
+
+  // Slower movement
+  const speed = Math.max(240, 380 - dodges * 6);
 
   noBtn.style.transition = `left ${speed}ms ease, top ${speed}ms ease`;
-  noBtn.style.left = left + "px";
-  noBtn.style.top  = top  + "px";
+  noBtn.style.left = `${left}px`;
+  noBtn.style.top  = `${top}px`;
 }
 
-// detect cursor near NO
+// If cursor near NO -> dodge
 document.addEventListener("mousemove", (e) => {
   const r = noBtn.getBoundingClientRect();
   const near =
@@ -253,7 +261,7 @@ document.addEventListener("mousemove", (e) => {
   if(near) dodgeNo();
 });
 
-// clicking NO -> message + dodge
+// Clicking NO -> message + dodge
 noBtn.addEventListener("click", (e) => {
   e.preventDefault();
   e.stopPropagation();
@@ -261,7 +269,7 @@ noBtn.addEventListener("click", (e) => {
   dodgeNo();
   setTimeout(() => hint.textContent = "", 1200);
 });
-/* --- END ONLY CHANGED PART --- */
+/* ===== END NO MOVEMENT FIX ===== */
 
 // roses after YES
 let roseTimer = null;
