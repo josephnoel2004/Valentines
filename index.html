@@ -1,202 +1,337 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Nishka 💗</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nishka 💗</title>
 
-<style>
-body{
-margin:0;
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-font-family:Arial, sans-serif;
-overflow:hidden;
-background:linear-gradient(180deg,#ffd6e8,#fff);
-}
+  <style>
+    :root{
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --pink:#ff2e83;
+      --bg1:#ffd1e6;
+      --bg2:#ffeaf4;
+      --card:#ffffff;
+    }
 
-/* floating hearts background */
-.bgHeart{
-position:fixed;
-font-size:20px;
-opacity:0.15;
-animation:float 12s linear infinite;
-}
-@keyframes float{
-from{transform:translateY(110vh)}
-to{transform:translateY(-20vh)}
-}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255,46,131,0.16), transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(255,46,131,0.12), transparent 42%),
+        radial-gradient(circle at 45% 92%, rgba(255,46,131,0.10), transparent 50%),
+        linear-gradient(180deg, var(--bg1), var(--bg2), #fff);
+    }
 
-.card{
-background:white;
-padding:35px;
-border-radius:25px;
-box-shadow:0 20px 70px rgba(0,0,0,0.2);
-text-align:center;
-width:700px;
-max-width:90%;
-position:relative;
-}
+    /* Floating hearts in the background */
+    .float-hearts{
+      position:fixed; inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+    }
+    .fh{
+      position:absolute;
+      opacity:0.16;
+      animation: drift linear infinite;
+      filter: blur(0.15px);
+    }
+    @keyframes drift{
+      from{ transform: translateY(110vh) translateX(0) rotate(0deg); }
+      to  { transform: translateY(-25vh) translateX(40px) rotate(360deg); }
+    }
 
-button{
-padding:14px 26px;
-border:none;
-border-radius:999px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-margin:6px;
-}
+    .card{
+      width:min(760px, 92vw);
+      background:var(--card);
+      border-radius:30px;
+      padding:36px 30px;
+      box-shadow: 0 22px 85px rgba(0,0,0,0.18);
+      text-align:center;
+      position:relative;
+      z-index:2;
+      animation: popIn 520ms ease both;
+    }
+    @keyframes popIn{
+      from{ transform: translateY(18px) scale(0.98); opacity:0; }
+      to  { transform: translateY(0) scale(1); opacity:1; }
+    }
 
-#yesBtn{
-background:#ff2e83;
-color:white;
-animation:pulse 1.3s infinite;
-}
+    h1{
+      margin:0 0 10px;
+      font-size:34px;
+      letter-spacing:-0.4px;
+    }
+    p{
+      margin:0 0 22px;
+      opacity:0.85;
+      font-size:16px;
+    }
 
-@keyframes pulse{
-0%,100%{transform:scale(1)}
-50%{transform:scale(1.07)}
-}
+    /* Button row */
+    .btnRow{
+      display:flex;
+      justify-content:center;
+      gap:16px;
+      align-items:center;
+      margin-top:10px;
+      position:relative;
+      height:64px;
+    }
 
-#noBtn{
-background:#eee;
-position:absolute;
-}
+    button{
+      border:0;
+      padding:14px 26px;
+      border-radius:999px;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      user-select:none;
+      transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+    }
+    button:active{ transform: scale(0.98); }
 
-.overlay{
-position:fixed;
-inset:0;
-background:rgba(0,0,0,0.5);
-display:none;
-justify-content:center;
-align-items:center;
-z-index:5;
-}
+    #yesBtn{
+      background:var(--pink);
+      color:#fff;
+      box-shadow: 0 14px 34px rgba(255,46,131,0.30);
+      animation: pulse 1.25s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: translateY(0) scale(1); }
+      50%{ transform: translateY(-1px) scale(1.03); }
+    }
 
-.overlay.show{display:flex;}
+    #noBtn{
+      background:#f2f2f2;
+      color:#222;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.12);
+      position:relative; /* we move it using translate (stays in row) */
+    }
 
-.loveBox{
-background:white;
-padding:25px;
-border-radius:25px;
-text-align:center;
-}
+    .hint{
+      margin-top:14px;
+      min-height:26px;
+      font-weight:800;
+      opacity:0.9;
+    }
 
-.heartImg{
-width:270px;
-height:270px;
-object-fit:cover;
+    /* Overlay modal */
+    .overlay{
+      position:fixed; inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,0.45);
+      z-index:50;
+      padding:22px;
+      backdrop-filter: blur(2px);
+    }
+    .overlay.show{ display:grid; }
 
-/* zoom out + move down */
-transform:scale(0.9);
-object-position:center 80%;
+    .loveBox{
+      width:min(600px, 94vw);
+      background:#fff;
+      border-radius:30px;
+      padding:22px 22px 18px;
+      box-shadow: 0 24px 95px rgba(0,0,0,0.28);
+      text-align:center;
+      animation: modalIn 420ms ease both;
+      position:relative;
+      overflow:hidden;
+    }
+    @keyframes modalIn{
+      from{ transform: translateY(18px) scale(0.985); opacity:0; }
+      to  { transform: translateY(0) scale(1); opacity:1; }
+    }
 
-clip-path:path("M140 254 C 22 180, 10 98, 70 60 C 102 34, 128 58, 140 84 C 152 58, 178 34, 210 60 C 270 98, 258 180, 140 254 Z");
-display:block;
-margin:auto;
-}
+    .loveBox::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(circle at top, rgba(255,46,131,0.16), transparent 60%);
+      pointer-events:none;
+    }
 
-.rose{
-position:fixed;
-top:-40px;
-font-size:28px;
-animation:fall linear forwards;
-pointer-events:none;
-}
-@keyframes fall{
-to{transform:translateY(110vh) rotate(360deg)}
-}
-</style>
+    /* Heart image container */
+    .heartWrap{
+      width:300px;
+      height:300px;
+      margin: 8px auto 14px;
+      filter: drop-shadow(0 16px 38px rgba(0,0,0,0.18));
+      position:relative;
+      z-index:1;
+    }
+
+    .heartImg{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+
+      /* FIX: zoom out + push image DOWN so faces show */
+      transform: scale(0.82);
+      object-position: center 92%;
+
+      clip-path: path("M150 272 C 24 192, 12 105, 75 64 C 110 36, 138 62, 150 90 C 162 62, 190 36, 225 64 C 288 105, 276 192, 150 272 Z");
+      border-radius:18px;
+      display:block;
+      background:#fff;
+    }
+
+    .loveTitle{
+      font-size:22px;
+      font-weight:950;
+      margin:6px 0 6px;
+      position:relative;
+      z-index:1;
+    }
+    .loveSub{
+      margin:0;
+      font-weight:700;
+      opacity:0.92;
+      line-height:1.35;
+      position:relative;
+      z-index:1;
+    }
+    .tap{
+      margin-top:10px;
+      font-size:13px;
+      opacity:0.72;
+      position:relative;
+      z-index:1;
+    }
+
+    /* Falling roses */
+    .rose{
+      position:fixed;
+      top:-40px;
+      font-size:28px;
+      z-index:60;
+      pointer-events:none;
+      animation: fall linear forwards;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,0.15));
+    }
+    @keyframes fall{
+      to{
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.98;
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div class="float-hearts" id="floatHearts"></div>
 
-<!-- floating hearts -->
-<script>
-for(let i=0;i<18;i++){
-let h=document.createElement("div");
-h.className="bgHeart";
-h.textContent="💗";
-h.style.left=Math.random()*100+"vw";
-h.style.animationDuration=(8+Math.random()*8)+"s";
-document.body.appendChild(h);
-}
-</script>
+  <div class="card" id="card">
+    <h1>💘 Nishka, will you be my Valentine? 💘</h1>
+    <p>Choose wisely 😭</p>
 
-<div class="card" id="card">
-<h2>💘 Nishka, will you be my Valentine? 💘</h2>
+    <div class="btnRow" id="btnRow">
+      <button id="yesBtn">Yes 💗</button>
+      <button id="noBtn">No 😢</button>
+    </div>
 
-<button id="yesBtn">Yes 💗</button>
-<button id="noBtn">No 😢</button>
-</div>
+    <div class="hint" id="hint"></div>
+  </div>
 
-<div class="overlay" id="overlay">
-<div class="loveBox">
+  <div class="overlay" id="overlay">
+    <div class="loveBox">
+      <div class="heartWrap">
+        <img class="heartImg" src="IMG_2696.jpg" alt="Us" />
+      </div>
 
-<img class="heartImg" src="IMG_2696.jpg">
+      <div class="loveTitle">YAYYY 😭💗 I LOVE YOU!</div>
+      <p class="loveSub">
+        You’re the best Valentine ever…<br />
+        Your gifts will arrive when I arrive ❤️
+      </p>
+      <div class="tap">(Tap anywhere to close)</div>
+    </div>
+  </div>
 
-<h3>YAYYY 💗 I LOVE YOU!💗</h3>
-<p>You’re the best Valentine ever…<br>
-Your gifts will arrive when I arrive ❤️</p>
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const hint   = document.getElementById("hint");
+    const overlay = document.getElementById("overlay");
+    const btnRow = document.getElementById("btnRow");
+    const floatHearts = document.getElementById("floatHearts");
 
-<p style="opacity:.7">(tap anywhere to close)</p>
+    // Background floating hearts
+    const heartEmojis = ["💗","💖","💘","💕","💞"];
+    for (let i = 0; i < 18; i++) {
+      const h = document.createElement("div");
+      h.className = "fh";
+      h.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+      h.style.left = Math.random() * 100 + "vw";
+      h.style.top  = (Math.random() * 100) + "vh";
+      h.style.animationDuration = (10 + Math.random() * 10) + "s";
+      h.style.fontSize = (14 + Math.random() * 18) + "px";
+      floatHearts.appendChild(h);
+    }
 
-</div>
-</div>
+    // NO starts next to YES (no movement initially)
+    noBtn.style.transform = "translate(0,0)";
 
-<script>
-const yesBtn=document.getElementById("yesBtn");
-const noBtn=document.getElementById("noBtn");
-const overlay=document.getElementById("overlay");
-const card=document.getElementById("card");
+    // Make NO dodge only when cursor gets near it
+    function dodgeNo() {
+      const maxX = 220; // sideways dodge
+      const maxY = 60;  // small vertical dodge
+      const x = (Math.random() * maxX) - (maxX / 2);
+      const y = (Math.random() * maxY) - (maxY / 2);
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    }
 
-/* NO button dodge */
-function moveNo(){
-let cardRect=card.getBoundingClientRect();
-let btnRect=noBtn.getBoundingClientRect();
+    // Detect cursor near the NO button (works even if we block click)
+    btnRow.addEventListener("mousemove", (e) => {
+      const r = noBtn.getBoundingClientRect();
+      const near =
+        e.clientX > r.left - 70 && e.clientX < r.right + 70 &&
+        e.clientY > r.top - 70 && e.clientY < r.bottom + 70;
+      if (near) dodgeNo();
+    });
 
-let x=Math.random()*(cardRect.width-btnRect.width-20);
-let y=Math.random()*(cardRect.height-btnRect.height-20);
+    // Make sure NO cannot be clicked
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      hint.textContent = "Too bad 😌 Try again.";
+      dodgeNo();
+      setTimeout(() => hint.textContent = "", 1200);
+    });
 
-noBtn.style.left=x+"px";
-noBtn.style.top=y+"px";
-}
+    // Roses effect
+    let roseTimer = null;
+    function startRoses() {
+      if (roseTimer) return;
+      roseTimer = setInterval(() => {
+        const rose = document.createElement("div");
+        rose.className = "rose";
+        rose.textContent = "🌹";
+        rose.style.left = Math.random() * 100 + "vw";
+        rose.style.animationDuration = (2.8 + Math.random() * 2.6) + "s";
+        rose.style.opacity = (0.75 + Math.random() * 0.25).toFixed(2);
+        document.body.appendChild(rose);
+        setTimeout(() => rose.remove(), 6500);
+      }, 120);
+    }
 
-noBtn.addEventListener("mouseenter",moveNo);
-noBtn.addEventListener("mousemove",moveNo);
+    yesBtn.addEventListener("click", () => {
+      overlay.classList.add("show");
+      startRoses();
 
-noBtn.addEventListener("click",(e)=>{
-e.preventDefault();
-moveNo();
-});
+      // stop pulsing after click
+      yesBtn.style.animation = "none";
+      yesBtn.disabled = true;
+      yesBtn.style.opacity = "0.95";
+    });
 
-/* YES click */
-yesBtn.onclick=()=>{
-overlay.classList.add("show");
-startRoses();
-};
-
-/* close overlay */
-overlay.onclick=()=>overlay.classList.remove("show");
-
-/* roses */
-function startRoses(){
-setInterval(()=>{
-let r=document.createElement("div");
-r.className="rose";
-r.textContent="🌹";
-r.style.left=Math.random()*100+"vw";
-r.style.animationDuration=(2+Math.random()*2)+"s";
-document.body.appendChild(r);
-setTimeout(()=>r.remove(),4000);
-},120);
-}
-
-/* start position */
-moveNo();
-</script>
-
+    overlay.addEventListener("click", () => {
+      overlay.classList.remove("show");
+    });
+  </script>
 </body>
 </html>
