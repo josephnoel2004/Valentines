@@ -230,7 +230,7 @@ function dodgeNo(){
   const left = pad + Math.random() * maxLeft;
   const top  = pad + Math.random() * maxTop;
 
-  const speed = Math.max(40, 140 - dodges * 8);
+  const speed = Math.max(40, 140 - dodges * 6);
   noBtn.style.transition = `left ${speed}ms ease, top ${speed}ms ease`;
   noBtn.style.left = left + "px";
   noBtn.style.top  = top  + "px";
@@ -284,3 +284,4 @@ overlay.addEventListener("click", () => {
 </script>
 </body>
 </html>
+
