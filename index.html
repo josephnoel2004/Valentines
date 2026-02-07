@@ -14,16 +14,23 @@
       background: radial-gradient(circle at top, #ffe6f2, #fff);
       overflow: hidden;
     }
+    .hearts-bg {
+      position: fixed; inset: 0; pointer-events: none; opacity: 0.45;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,46,131,0.18) 0 28px, transparent 29px),
+        radial-gradient(circle at 80% 60%, rgba(255,46,131,0.12) 0 34px, transparent 35px),
+        radial-gradient(circle at 55% 15%, rgba(255,46,131,0.10) 0 26px, transparent 27px);
+    }
     .card {
-      width: min(520px, 92vw);
+      width: min(560px, 92vw);
       background: white;
-      border-radius: 24px;
+      border-radius: 26px;
       padding: 28px 22px;
       box-shadow: 0 18px 60px rgba(0,0,0,0.12);
       text-align: center;
       position: relative;
     }
-    h1 { margin: 0 0 8px; font-size: 28px; }
+    h1 { margin: 0 0 10px; font-size: 28px; }
     p  { margin: 0 0 18px; opacity: 0.85; }
     .btns {
       display: flex;
@@ -32,7 +39,6 @@
       align-items: center;
       margin-top: 14px;
       position: relative;
-      height: 64px;
     }
     button {
       border: 0;
@@ -40,115 +46,118 @@
       border-radius: 999px;
       font-size: 16px;
       cursor: pointer;
-      transition: transform 0.08s ease;
+      transition: transform 0.08s ease, opacity 0.15s ease;
       user-select: none;
+      font-weight: 650;
+      min-width: 120px;
     }
     button:active { transform: scale(0.98); }
     #yesBtn { background: #ff2e83; color: white; }
-    #noBtn  { background: #f2f2f2; color: #222; position: absolute; left: 50%; transform: translateX(80px); }
-    .msg {
-      margin-top: 16px;
-      min-height: 26px;
-      font-weight: 600;
+    #noBtn  { background: #f2f2f2; color: #222; }
+
+    /* Make NO "not clickable" */
+    #noBtn {
+      pointer-events: none;       /* can't click */
+      opacity: 0.95;
+      position: relative;         /* so we can move it slightly */
     }
+
+    .msg { margin-top: 16px; min-height: 26px; font-weight: 700; }
     .small { font-size: 13px; opacity: 0.75; margin-top: 6px; }
-    .hearts {
+
+    /* Overlay after YES */
+    .overlay {
+      position: fixed; inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(0,0,0,0.45);
+      z-index: 50;
+      padding: 22px;
+    }
+    .overlay.show { display: grid; }
+
+    .loveBox {
+      width: min(520px, 94vw);
+      background: white;
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.25);
+      text-align: center;
+    }
+
+    /* Heart photo frame */
+    .heartFrame {
+      width: 260px;
+      height: 260px;
+      margin: 10px auto 14px;
+      position: relative;
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.18));
+    }
+    .heartFrame::before,
+    .heartFrame::after {
+      content: "";
+      position: absolute;
+      width: 130px;
+      height: 200px;
+      background: #ff2e83;
+      border-radius: 130px 130px 0 0;
+      top: 35px;
+      left: 65px;
+      transform: rotate(-45deg);
+      transform-origin: 0 100%;
+      opacity: 0.12; /* soft pink border behind */
+    }
+    .heartFrame::after {
+      left: 65px;
+      transform: rotate(45deg);
+      transform-origin: 100% 100%;
+    }
+
+    .heartImg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* heart shape */
+      clip-path: path("M130 235 C 20 170, 10 95, 65 60 C 95 35, 120 55, 130 75 C 140 55, 165 35, 195 60 C 250 95, 240 170, 130 235 Z");
+      border-radius: 18px;
+      display: block;
+    }
+
+    .loveText {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 6px 0 6px;
+    }
+    .loveSub {
+      margin: 0;
+      opacity: 0.9;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    /* Falling roses */
+    .rose {
       position: fixed;
-      inset: 0;
+      top: -40px;
+      font-size: 26px;
+      z-index: 60;
       pointer-events: none;
-      opacity: 0.5;
-      background-image:
-        radial-gradient(circle at 20% 30%, rgba(255,46,131,0.20) 0 28px, transparent 29px),
-        radial-gradient(circle at 80% 60%, rgba(255,46,131,0.12) 0 34px, transparent 35px),
-        radial-gradient(circle at 55% 15%, rgba(255,46,131,0.10) 0 26px, transparent 27px);
-      filter: blur(0.2px);
+      animation: fall linear forwards;
+      filter: drop-shadow(0 8px 10px rgba(0,0,0,0.15));
+    }
+    @keyframes fall {
+      to {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.98;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="hearts"></div>
+  <div class="hearts-bg"></div>
 
   <div class="card" id="card">
     <h1>💘 Nishka, will you be my Valentine? 💘</h1>
     <p>Be honest… but also choose wisely 😭</p>
 
-    <div class="btns" id="btnArea">
-      <button id="yesBtn">Yes 💗</button>
-      <button id="noBtn" aria-label="No">No 🙃</button>
-    </div>
-
-    <div class="msg" id="msg"></div>
-    <div class="small" id="small"></div>
-  </div>
-
-  <script>
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn  = document.getElementById("noBtn");
-    const msg    = document.getElementById("msg");
-    const small  = document.getElementById("small");
-    const card   = document.getElementById("card");
-
-    let noClicks = 0;
-
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
-    }
-
-    function moveNoButtonAway() {
-      // Keep the button inside the card area
-      const cardRect = card.getBoundingClientRect();
-      const btnRect  = noBtn.getBoundingClientRect();
-
-      const padding = 16;
-
-      // Random new position within card bounds
-      const maxLeft = (cardRect.width - btnRect.width) - padding;
-      const maxTop  = (cardRect.height - btnRect.height) - padding;
-
-      const newLeft = clamp(Math.random() * maxLeft, padding, maxLeft);
-      // Place it around the buttons area vertically (so it stays visible)
-      const baseTop = 170; // tuned for this layout
-      const wiggle  = (Math.random() * 60) - 30;
-      const newTop  = clamp(baseTop + wiggle, 120, maxTop);
-
-      // Position relative to card
-      noBtn.style.left = `${newLeft}px`;
-      noBtn.style.top  = `${newTop}px`;
-      noBtn.style.transform = `none`;
-    }
-
-    // Make "No" dodge when she gets close
-    noBtn.addEventListener("mousemove", moveNoButtonAway);
-    noBtn.addEventListener("mouseenter", moveNoButtonAway);
-
-    // If she somehow clicks No 3 times
-    noBtn.addEventListener("click", () => {
-      noClicks++;
-      if (noClicks >= 3) {
-        msg.textContent = "Too bad. Try again 😌💗";
-        small.textContent = "No is not an option, madam.";
-        // Optional: make it extra annoying after 3 clicks
-        moveNoButtonAway();
-      } else {
-        msg.textContent = `Nice try 😭 (${noClicks}/3)`;
-        small.textContent = "";
-        moveNoButtonAway();
-      }
-    });
-
-    // YES result
-    yesBtn.addEventListener("click", () => {
-      msg.textContent = "YAYYY 😭💗 I knew it!!!";
-      small.textContent = "Screenshot this and send it to me 😌";
-      // Disable No so it stops moving
-      noBtn.disabled = true;
-      noBtn.style.opacity = "0.6";
-      noBtn.style.cursor = "not-allowed";
-    });
-
-    // Start with a nice visible position
-    // Put the No button inside the card layout (absolute needs top)
-    noBtn.style.top = "170px";
-  </script>
-</body>
-</html>
+    <div class
