@@ -55,7 +55,7 @@ h1{ margin:0 0 14px; font-size:34px; letter-spacing:-0.4px; }
 
 .btnRow{
   display:flex;
-  justify-content:center;  /* ✅ centered */
+  justify-content:center;
   align-items:center;
   gap:16px;
   margin-top:6px;
@@ -88,7 +88,7 @@ button:active{ transform: scale(0.98); }
   background:#f2f2f2;
   color:#222;
   box-shadow: 0 12px 26px rgba(0,0,0,0.12);
-  position:relative; /* ✅ normal at start */
+  position:relative; /* start centered next to YES */
 }
 
 /* overlay */
@@ -133,12 +133,12 @@ button:active{ transform: scale(0.98); }
 .loveSub{ margin:0; font-weight:700; opacity:0.92; line-height:1.35; }
 .tap{ margin-top:10px; font-size:13px; opacity:0.72; }
 
-/* ✅ Roses ABOVE everything (including overlay) */
+/* roses ABOVE everything */
 .rose{
   position:fixed;
   top:-40px;
   font-size:28px;
-  z-index:9999;          /* ✅ above overlay */
+  z-index:9999;
   pointer-events:none;
   animation: fall linear forwards;
   filter: drop-shadow(0 10px 14px rgba(0,0,0,0.15));
@@ -185,7 +185,6 @@ const yesBtn = document.getElementById("yesBtn");
 const noBtn  = document.getElementById("noBtn");
 const hint   = document.getElementById("hint");
 const overlay = document.getElementById("overlay");
-const btnRow = document.getElementById("btnRow");
 const floatHearts = document.getElementById("floatHearts");
 
 // floating hearts bg
@@ -201,36 +200,44 @@ for (let i = 0; i < 18; i++) {
   floatHearts.appendChild(h);
 }
 
-// --- NO behavior: centered at start, then becomes fixed when dodging ---
+/* --- ONLY CHANGED PART: NO movement slower + clamped on-screen --- */
 let detached = false;
 let dodges = 0;
 
 function detachNoIfNeeded(){
   if(detached) return;
   detached = true;
-
   const r = noBtn.getBoundingClientRect();
-
-  // turn into fixed at the SAME spot on screen (no jump)
   noBtn.style.position = "fixed";
   noBtn.style.left = r.left + "px";
   noBtn.style.top  = r.top  + "px";
   noBtn.style.transform = "none";
 }
 
+function clamp(val, min, max){
+  return Math.max(min, Math.min(max, val));
+}
+
 function dodgeNo(){
   detachNoIfNeeded();
   dodges++;
 
-  const pad = 10;
+  const pad = 12;
   const btnRect = noBtn.getBoundingClientRect();
+
   const maxLeft = window.innerWidth  - btnRect.width  - pad;
   const maxTop  = window.innerHeight - btnRect.height - pad;
 
-  const left = pad + Math.random() * maxLeft;
-  const top  = pad + Math.random() * maxTop;
+  // pick a random position then CLAMP it so it never goes off-screen
+  let left = pad + Math.random() * maxLeft;
+  let top  = pad + Math.random() * maxTop;
 
-  const speed = Math.max(40, 140 - dodges * 6);
+  left = clamp(left, pad, maxLeft);
+  top  = clamp(top, pad, maxTop);
+
+  // SLOWER movement (bigger ms = slower)
+  const speed = Math.max(220, 340 - dodges * 6);
+
   noBtn.style.transition = `left ${speed}ms ease, top ${speed}ms ease`;
   noBtn.style.left = left + "px";
   noBtn.style.top  = top  + "px";
@@ -254,8 +261,9 @@ noBtn.addEventListener("click", (e) => {
   dodgeNo();
   setTimeout(() => hint.textContent = "", 1200);
 });
+/* --- END ONLY CHANGED PART --- */
 
-// roses after YES (above overlay)
+// roses after YES
 let roseTimer = null;
 function startRoses(){
   if(roseTimer) return;
@@ -284,4 +292,3 @@ overlay.addEventListener("click", () => {
 </script>
 </body>
 </html>
-
