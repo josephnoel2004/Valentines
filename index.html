@@ -280,7 +280,7 @@ function dodgeNo(){
   ty = clamp(ny, minY, maxY);
 
   // slower movement
-  const speed = Math.max(260, 420 - dodges * 6);
+  const speed = Math.max(260, 420 - dodges * 4);
   noBtn.style.transition = `transform ${speed}ms ease`;
   noBtn.style.transform = `translate(${Math.round(tx)}px, ${Math.round(ty)}px)`;
 
@@ -344,3 +344,4 @@ overlay.addEventListener("click", () => {
 </script>
 </body>
 </html>
+
