@@ -55,7 +55,7 @@ h1{ margin:0 0 14px; font-size:34px; letter-spacing:-0.4px; }
 
 .btnRow{
   display:flex;
-  justify-content:center;
+  justify-content:center;  /* ✅ centered */
   align-items:center;
   gap:16px;
   margin-top:6px;
@@ -88,7 +88,7 @@ button:active{ transform: scale(0.98); }
   background:#f2f2f2;
   color:#222;
   box-shadow: 0 12px 26px rgba(0,0,0,0.12);
-  position:relative; /* start centered next to YES */
+  position:relative; /* ✅ normal at start */
 }
 
 /* overlay */
@@ -133,12 +133,12 @@ button:active{ transform: scale(0.98); }
 .loveSub{ margin:0; font-weight:700; opacity:0.92; line-height:1.35; }
 .tap{ margin-top:10px; font-size:13px; opacity:0.72; }
 
-/* roses ABOVE everything */
+/* ✅ Roses ABOVE everything (including overlay) */
 .rose{
   position:fixed;
   top:-40px;
   font-size:28px;
-  z-index:9999;
+  z-index:9999;          /* ✅ above overlay */
   pointer-events:none;
   animation: fall linear forwards;
   filter: drop-shadow(0 10px 14px rgba(0,0,0,0.15));
@@ -185,6 +185,7 @@ const yesBtn = document.getElementById("yesBtn");
 const noBtn  = document.getElementById("noBtn");
 const hint   = document.getElementById("hint");
 const overlay = document.getElementById("overlay");
+const btnRow = document.getElementById("btnRow");
 const floatHearts = document.getElementById("floatHearts");
 
 // floating hearts bg
@@ -200,100 +201,39 @@ for (let i = 0; i < 18; i++) {
   floatHearts.appendChild(h);
 }
 
-/* ===== NO button: guaranteed never off-screen ===== */
+// --- NO behavior: centered at start, then becomes fixed when dodging ---
 let detached = false;
 let dodges = 0;
-let tx = 0, ty = 0; // current translate position
-
-function getVisibleViewport(){
-  const vv = window.visualViewport;
-  if (vv) {
-    return {
-      left: vv.offsetLeft,
-      top: vv.offsetTop,
-      width: vv.width,
-      height: vv.height
-    };
-  }
-  return { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-}
-
-function clamp(v, min, max){
-  if (max < min) return min;
-  return Math.max(min, Math.min(max, v));
-}
-
-function clampNoIntoView(){
-  if (!detached) return;
-
-  const pad = 12;
-  const vp = getVisibleViewport();
-  const bw = noBtn.offsetWidth;
-  const bh = noBtn.offsetHeight;
-
-  const minX = vp.left + pad;
-  const minY = vp.top + pad;
-  const maxX = vp.left + vp.width  - bw - pad;
-  const maxY = vp.top + vp.height - bh - pad;
-
-  tx = clamp(tx, minX, maxX);
-  ty = clamp(ty, minY, maxY);
-
-  noBtn.style.transform = `translate(${Math.round(tx)}px, ${Math.round(ty)}px)`;
-}
 
 function detachNoIfNeeded(){
-  if (detached) return;
+  if(detached) return;
   detached = true;
 
-  // capture current on-screen position then anchor to (0,0) fixed and use translate
   const r = noBtn.getBoundingClientRect();
-  tx = r.left;
-  ty = r.top;
 
+  // turn into fixed at the SAME spot on screen (no jump)
   noBtn.style.position = "fixed";
-  noBtn.style.left = "0px";
-  noBtn.style.top  = "0px";
-  noBtn.style.transform = `translate(${Math.round(tx)}px, ${Math.round(ty)}px)`;
-  noBtn.style.willChange = "transform";
+  noBtn.style.left = r.left + "px";
+  noBtn.style.top  = r.top  + "px";
+  noBtn.style.transform = "none";
 }
 
 function dodgeNo(){
   detachNoIfNeeded();
   dodges++;
 
-  const pad = 12;
-  const vp = getVisibleViewport();
-  const bw = noBtn.offsetWidth;
-  const bh = noBtn.offsetHeight;
+  const pad = 10;
+  const btnRect = noBtn.getBoundingClientRect();
+  const maxLeft = window.innerWidth  - btnRect.width  - pad;
+  const maxTop  = window.innerHeight - btnRect.height - pad;
 
-  const minX = vp.left + pad;
-  const minY = vp.top + pad;
-  const maxX = vp.left + vp.width  - bw - pad;
-  const maxY = vp.top + vp.height - bh - pad;
+  const left = pad + Math.random() * maxLeft;
+  const top  = pad + Math.random() * maxTop;
 
-  // random new target inside visible viewport
-  const nx = minX + Math.random() * Math.max(0, maxX - minX);
-  const ny = minY + Math.random() * Math.max(0, maxY - minY);
-
-  tx = clamp(nx, minX, maxX);
-  ty = clamp(ny, minY, maxY);
-
-  // slower movement
-  const speed = Math.max(260, 420 - dodges * 4);
-  noBtn.style.transition = `transform ${speed}ms ease`;
-  noBtn.style.transform = `translate(${Math.round(tx)}px, ${Math.round(ty)}px)`;
-
-  // clamp again after movement (extra safety)
-  setTimeout(clampNoIntoView, speed + 20);
-}
-
-noBtn.addEventListener("transitionend", clampNoIntoView);
-window.addEventListener("resize", clampNoIntoView);
-window.addEventListener("scroll", clampNoIntoView, { passive: true });
-if (window.visualViewport) {
-  window.visualViewport.addEventListener("resize", clampNoIntoView);
-  window.visualViewport.addEventListener("scroll", clampNoIntoView);
+  const speed = Math.max(40, 140 - dodges * 8);
+  noBtn.style.transition = `left ${speed}ms ease, top ${speed}ms ease`;
+  noBtn.style.left = left + "px";
+  noBtn.style.top  = top  + "px";
 }
 
 // detect cursor near NO
@@ -302,7 +242,8 @@ document.addEventListener("mousemove", (e) => {
   const near =
     e.clientX > r.left - 90 && e.clientX < r.right + 90 &&
     e.clientY > r.top  - 90 && e.clientY < r.bottom + 90;
-  if (near) dodgeNo();
+
+  if(near) dodgeNo();
 });
 
 // clicking NO -> message + dodge
@@ -313,9 +254,8 @@ noBtn.addEventListener("click", (e) => {
   dodgeNo();
   setTimeout(() => hint.textContent = "", 1200);
 });
-/* ===== END NO fix ===== */
 
-// roses after YES
+// roses after YES (above overlay)
 let roseTimer = null;
 function startRoses(){
   if(roseTimer) return;
@@ -344,4 +284,3 @@ overlay.addEventListener("click", () => {
 </script>
 </body>
 </html>
-
